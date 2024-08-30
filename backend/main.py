@@ -20,14 +20,14 @@ app.add_middleware(
     allow_headers=['*'],   
 )
 
-class TransactionBase(BaseModel):
-    amount: float
+class TodoBase(BaseModel):
+    titulo: str
     category: str
     description: str
-    is_income: bool
+    is_priority: bool
     date: str
 
-class TransactionModel(TransactionBase):
+class TodoModel(TodoBase):
     id: int
 
     class Config:
@@ -44,15 +44,15 @@ db_dependency = Annotated[Session, Depends(get_db)]
 
 models.Base.metadata.create_all(bind=engine)
 
-@app.post("/transactions/", response_model=TransactionModel)
-async def create_transaction(transaction: TransactionBase, db: db_dependency):
-    db_transaction = models.Transaction(**transaction.model_dump())
-    db.add(db_transaction)
+@app.post("/todos/", response_model=TodoModel)
+async def create_todo(todo: TodoBase, db: db_dependency):
+    db_todo = models.Todo(**todo.model_dump())
+    db.add(db_todo)
     db.commit()
-    db.refresh(db_transaction)
-    return db_transaction
+    db.refresh(db_todo)
+    return db_todo
 
-@app.get("/transactions/", response_model=List[TransactionModel])
-async def read_transactions(db: db_dependency, skip: int = 0, limit: int = 100):
-    transactions = db.query(models.Transaction).offset(skip).limit(limit).all()
-    return transactions
+@app.get("/todos/", response_model=List[TodoModel])
+async def read_todos(db: db_dependency, skip: int = 0, limit: int = 100):
+    todos = db.query(models.Todo).offset(skip).limit(limit).all()
+    return todos

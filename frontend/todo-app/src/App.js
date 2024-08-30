@@ -3,22 +3,22 @@ import api from "./api";
 import './App.css';
 
 const App = () => {
-  const [transactions, setTransactions] = useState([]);
+  const [todos, setTodos] = useState([]);
   const [formData, setFormData] = useState({
-    amount: '',
+    titulo: '',
     category: '',
     description: '',
-    is_income: false,
+    is_priority: false,
     date: '',
   });
 
-  const fetchTransactions = async () => {
-    const response = await api.get('/transactions/');
-    setTransactions(response.data);
+  const fetchTodos = async () => {
+    const response = await api.get('/todos/');
+    setTodos(response.data);
   };
 
   useEffect(() => {
-    fetchTransactions();
+    fetchTodos();
   }, []);
 
 
@@ -32,13 +32,13 @@ const App = () => {
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
-    await api.post('/transactions/', formData);
-    fetchTransactions();
+    await api.post('/todos/', formData);
+    fetchTodos();
     setFormData({
-      amount: '',
+      titulo: '',
       category: '',
       description: '',
-      is_income: false,
+      is_priority: false,
       date: '',
     });
   };
@@ -52,7 +52,7 @@ const App = () => {
           <form onSubmit={handleFormSubmit}>
             <div className="m-3" style={{}}>
               <p>Título</p>
-              <input type="text" className="form-control"  name="amount" placeholder="Insira o título da tarefa" value={formData.amount} onChange={handleInputChange} style={{background:"#1E1E26", color:"white", border: "none"}}/>
+              <input type="text" className="form-control"  name="titulo" placeholder="Insira o título da tarefa" value={formData.titulo} onChange={handleInputChange} style={{background:"#1E1E26", color:"white", border: "none"}}/>
               
             </div>
             <div className="m-3">
@@ -65,7 +65,7 @@ const App = () => {
             </div>
             <div className="m-3" style={{display: "flex", alignItems: "center"}}>
               <p style={{margin:"5px"}}>Prioridade?</p>
-              <input type="checkbox" className="" name="is_income"  value={formData.is_income} onChange={handleInputChange}  />
+              <input type="checkbox" className="" name="is_priority"  value={formData.is_priority} onChange={handleInputChange}  />
             </div>
             <div className="m-3">
               <input type="text" className="form-control" name="date" value={formData.date} onChange={handleInputChange} style={{background:"#1E1E26", color:"white", border: "none" }}/>
@@ -79,32 +79,32 @@ const App = () => {
         </div>
           <table className="table table-striped table-bordered table-hover" style={{margin: "20px auto", width: "80%",}}>
             <thead>
-              <th>Amount</th>
+              <th>titulo</th>
               <th>Category</th>
               <th>Description</th>
               <th>Prioridade?</th>
               <th>Date</th>
             </thead>
             <tbody>
-              {transactions.map((transaction)=> (
-                <tr key={transaction.id}>
-                  <td>{transaction.amount}</td>
-                  <td>{transaction.category}</td>
-                  <td>{transaction.description}</td>
-                  <td>{transaction.is_income ? 'Yes' : 'No'}</td>
-                  <td>{transaction.date}</td>
+              {todos.map((todo)=> (
+                <tr key={todo.id}>
+                  <td>{todo.titulo}</td>
+                  <td>{todo.category}</td>
+                  <td>{todo.description}</td>
+                  <td>{todo.is_priority ? 'Yes' : 'No'}</td>
+                  <td>{todo.date}</td>
                 </tr>
               ))}
             </tbody>
           </table>
            {/* <ul>
-            {transactions.map(transaction => (
-              <li key={transaction.id}>
-                <div>{transaction.amount}</div>
-                <div>{transaction.category}</div>
-                <div>{transaction.description}</div>
-                <div>{transaction.is_income ? 'Income' : 'Expense'}</div>
-                <div>{transaction.date}</div>
+            {todos.map(todo => (
+              <li key={todo.id}>
+                <div>{todo.titulo}</div>
+                <div>{todo.category}</div>
+                <div>{todo.description}</div>
+                <div>{todo.is_priority ? 'Income' : 'Expense'}</div>
+                <div>{todo.date}</div>
               </li>
             ))}
           </ul>  */}

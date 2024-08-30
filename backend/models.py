@@ -1,12 +1,12 @@
 from database import Base
 from sqlalchemy import Column, Integer, String, Float, Boolean
 
-class Transaction(Base):
-    __tablename__ = 'transactions'
+class Todo(Base):
+    __tablename__ = 'todos'
 
     id = Column(Integer, primary_key=True, index=True)
-    amount = Column(Float)
+    titulo = Column(String)
     category = Column(String)
     description = Column(String)
-    is_income = Column(Boolean)
+    is_priority = Column(Boolean)
     date = Column(String)

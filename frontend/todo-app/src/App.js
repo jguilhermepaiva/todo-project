@@ -49,9 +49,27 @@ const App = () => {
       date: "",
     });
   };
-
+  const handleDelete = async (todoId) => {
+    console.log(todoId);
+  
+    try {
+      const response = await fetch(`http://localhost:8000/todos/${todoId}`, {
+        method: 'DELETE',
+      });      
+      if (response.ok) {
+        console.log("Todo deleted successfully");
+        setTodos(todos.filter(todo => todo.id !== todoId));
+      } else {
+        console.error("Failed to delete the todo. Status:", response.status);
+      }
+    } catch (error) {
+      console.error("Error deleting todo:", error);
+    }
+  };
+  
+  
   return (
-    <div className="bg-[#1E1E26] max-md:bg-[#16161C]">
+    <div className="bg-[#1E1E26] max-md:bg-[#16161C] pb-10">
       <div className="max-w-[1250px] m-auto">
         <div className="flex items-center justify-between	m-auto">
           <div className="flex m-4 cursor-pointer">
@@ -60,7 +78,7 @@ const App = () => {
           </div>
           <img src={small_logo} alt="logo" className="mr-8"></img>
         </div>
-        <div className="flex justify-between mb-20 max-md:flex-col max-md:items-center ">
+        <div className="flex justify-between mb-20 max-md:flex-col max-md:items-center min-h-[450px]">
           <div className="w-1/3 ml-10 flex flex-col justify-between max-md:w-5/6 max-md:justify-start ">
             <div className="mt-10 ">
               <img
@@ -86,7 +104,7 @@ const App = () => {
           </div>
           <div className="bg-[#16161C] w-2/3 max-md:w-5/6">
             <div className="flex justify-between mt-3 m-auto w-full  text-white text-[22px] font-semibold">
-              <p className="ml-6">Minhas tasks</p>
+              <p className="ml-6 max-md:font-light	max-md:uppercase">Minhas tasks</p>
               <div
                 className="flex items-center justify-center rounded-full w-[40px] h-[40px] mr-6 max-md:hidden"
                 style={{
@@ -124,9 +142,10 @@ const App = () => {
                     </div> */}
                     </div>
                     <img
-                      className="h-[24px] w-[24]"
+                      className="h-[24px] w-[24] cursor-pointer"
                       src={del}
                       alt="delete"
+                      onClick={() => handleDelete(todo.id)} 
                     ></img>
                   </div>
                 </li>
@@ -145,14 +164,16 @@ const App = () => {
             </div>
           </div>
         </div>
+        
         <div
           style={{
             background: "#16161C",
             width: "80%",
-            margin: "10px auto",
+            margin: "400px auto",
             borderRadius: "10px",
             padding: "25px",
             color: "white",
+
           }}
         >
           <p
@@ -265,6 +286,7 @@ const App = () => {
             </div>
           </form>
         </div>
+        
 
         {/* <table
               className="table table-striped table-bordered table-hover max-w-[600px]"
@@ -291,6 +313,7 @@ const App = () => {
             </table> */}
       </div>
     </div>
+    
   );
 };
 

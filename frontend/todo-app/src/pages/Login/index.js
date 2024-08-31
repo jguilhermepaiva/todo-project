@@ -22,22 +22,23 @@ function Login() {
     event.preventDefault();
     if (!validateForm()) return;
     setLoading(true);
-
-    const formDetails = new URLSearchParams();
-    formDetails.append('username', username);
-    formDetails.append('password', password);
-
+  
+    const formData = {
+      username,
+      password,
+    };
+  
     try {
-      const response = await fetch('http://localhost:8000/token', {
+      const response = await fetch('http://localhost:8000/', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type': 'application/json',
         },
-        body: formDetails,
+        body: JSON.stringify(formData),
       });
-
+  
       setLoading(false);
-
+  
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem('token', data.access_token);
@@ -51,6 +52,7 @@ function Login() {
       setError('An error occurred. Please try again later.');
     }
   };
+  
 
   return (
     <div>

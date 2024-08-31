@@ -56,3 +56,15 @@ async def create_todo(todo: TodoBase, db: db_dependency):
 async def read_todos(db: db_dependency, skip: int = 0, limit: int = 100):
     todos = db.query(models.Todo).offset(skip).limit(limit).all()
     return todos
+
+@app.delete("/todos/{todo_id}", response_model=TodoModel)
+async def delete_todo(todo_id: int, db: db_dependency):
+    db_todo = db.query(models.Todo).filter(models.Todo.id == todo_id).first()
+    
+    if not db_todo:
+        raise HTTPException(status_code=404, detail="Todo not found")
+    
+    db.delete(db_todo)
+    db.commit()
+    
+    return db_todo

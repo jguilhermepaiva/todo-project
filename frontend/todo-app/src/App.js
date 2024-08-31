@@ -279,6 +279,7 @@ const App = () => {
                   borderRadius: "5px",
                   background:
                     "linear-gradient(225deg, #F29682, #EE69AC , #CB4BCF)",
+                  fontWeight: "400",
                 }}
               >
                 Adicionar

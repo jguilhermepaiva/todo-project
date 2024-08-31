@@ -6,6 +6,10 @@ import small_logo from "../../assets/small_logo.svg";
 import medium_logo from "../../assets/medium_logo.svg";
 import profile from "../../assets/profile.svg";
 import del from "../../assets/delete.png";
+import { useNavigate } from 'react-router-dom';
+
+
+
 
 const Todo = () => {
   const [todos, setTodos] = useState([]);
@@ -67,6 +71,26 @@ const Todo = () => {
     }
   };
 
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const verifyToken = async () => {
+      const token = localStorage.getItem('token');
+        console.log(token)
+      try {
+        const response = await fetch(`http://localhost:8000/verify-token/${token}`);
+  
+        if (!response.ok) {
+          throw new Error('Token verification failed');
+        }
+      } catch (error) {
+        localStorage.removeItem('token');
+        navigate('/');
+      }
+    };
+  
+    verifyToken();
+  }, [navigate]);
   
   return (
     <div className="bg-[#1E1E26] max-md:bg-[#16161C] pb-10">

@@ -153,7 +153,7 @@ const Todo = () => {
             </div>
           </div>
           <div className="bg-[#16161C] w-2/3 max-md:w-5/6">
-            <div className="flex justify-between mt-3 m-auto w-full text-white text-[22px] font-semibold">
+            <div className="flex justify-between my-3 m-auto w-full text-white text-[22px] font-semibold">
               <p className="ml-6 max-md:font-light max-md:uppercase">Minhas tasks</p>
               <div
                 className="flex items-center justify-center rounded-full w-[40px] h-[40px] mr-6 max-md:hidden cursor-pointer"
@@ -197,7 +197,7 @@ const Todo = () => {
             </ul>
             <div className="flex justify-end mt-10">
               <div
-                className="flex items-center justify-center rounded-full w-[40px] h-[40px] mr-6 md:hidden cursor-pointer"
+                className="flex items-center justify-center rounded-full w-[40px] h-[40px] mr-6 md:hidden cursor-pointer "
                 style={{
                   background:
                     "linear-gradient(225deg, #F29682, #EE69AC , #CB4BCF)",

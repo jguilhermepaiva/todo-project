@@ -9,6 +9,7 @@ function Login() {
   const [registerUsername, setRegisterUsername] = useState("");
   const [registerEmail, setRegisterEmail] = useState("");
   const [registerPassword, setRegisterPassword] = useState("");
+  const [registerConfirmPassword, setRegisterConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [isLogin, setIsLogin] = useState(true); 
@@ -61,7 +62,7 @@ function Login() {
   const handleRegister = async (event) => {
     event.preventDefault();
 
-    if (!validateForm(registerUsername, registerEmail ,registerPassword)) return;
+    if (!validateForm(registerUsername, registerEmail ,registerPassword, registerConfirmPassword)) return;
 
     setLoading(true);
 
@@ -69,6 +70,7 @@ function Login() {
       username: registerUsername,
       email: registerEmail,
       password: registerPassword,
+      confirm_password: registerConfirmPassword,
     };
 
     try {
@@ -223,7 +225,7 @@ function Login() {
                 </label>
                 <br />
                 <input
-                  className="bg-[#1E1E26] w-[300px] h-[40px] rounded mb-10"
+                  className="bg-[#1E1E26] w-[300px] h-[40px] rounded"
                   style={{
                     color: "white",
                     border: "none",
@@ -232,6 +234,23 @@ function Login() {
                   type="password"
                   value={registerPassword}
                   onChange={(e) => setRegisterPassword(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="text-white text-[20px] font-semibold mt-3">
+                  Confirme sua Senha
+                </label>
+                <br />
+                <input
+                  className="bg-[#1E1E26] w-[300px] h-[40px] rounded mb-10"
+                  style={{
+                    color: "white",
+                    border: "none",
+                    padding: "0 10px",
+                  }}
+                  type="password"
+                  value={registerConfirmPassword}
+                  onChange={(e) => setRegisterConfirmPassword(e.target.value)}
                 />
               </div>
               <button

@@ -8,13 +8,13 @@ import models
 from models import User
 from fastapi.middleware.cors import CORSMiddleware
 from routers import auth
-from routers.auth import get_current_user
+# from routers.auth import get_current_user
 from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
 from jose import jwt, JWTError
 
 app = FastAPI()
-app.include_router(auth.router)
+# app.include_router(auth.router)
 
 origins = [
     'http://localhost:3000',
@@ -29,13 +29,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=['*'],
-    allow_headers=['*'],   
-)
+
 
 class TodoBase(BaseModel):
     titulo: str
@@ -57,7 +51,7 @@ def get_db():
         db.close()
 
 db_dependency = Annotated[Session, Depends(get_db)]
-user_dependency = Annotated[dict, Depends(get_current_user)]
+# user_dependency = Annotated[dict, Depends(get_current_user)]
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
@@ -113,7 +107,7 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
+            detail="Email ou senha incorretos",
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -138,18 +132,30 @@ async def verify_user_token(token: str):
     verify_token(token=token)
     return {"message": "Token is valid"}
 
+def get_user_by_username(db: Session, username: str):
+    return db.query(User).filter(User.username == username).first()
 
+@app.get("/users/me", response_model=UserCreate)
+def read_users_me(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    payload = verify_token(token)
+    username: str = payload.get("sub")
+    if username is None:
+        raise HTTPException(status_code=403, detail="Invalid token")
+    user = get_user_by_username(db, username)
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
 
 
 
 
 models.Base.metadata.create_all(bind=engine)
 
-@app.get("/", status_code=status.HTTP_200_OK)
-async def user(user: None, db: db_dependency):
-    if user is None:
-        raise HTTPException(status_code=401, detail='Authentication failed')
-    return {"User": user}
+# @app.get("/", status_code=status.HTTP_200_OK)
+# async def user(user: None, db: db_dependency):
+#     if user is None:
+#         raise HTTPException(status_code=401, detail='Authentication failed')
+#     return {"User": user}
 
 
 @app.post("/todos/", response_model=TodoModel)

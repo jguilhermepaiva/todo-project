@@ -9,8 +9,6 @@ import del from "../../assets/delete.png";
 import { useNavigate } from 'react-router-dom';
 
 
-
-
 const Todo = () => {
   const [todos, setTodos] = useState([]);
   const [formData, setFormData] = useState({
@@ -21,10 +19,39 @@ const Todo = () => {
     date: "",
   });
 
+  const [username, setUsername] = useState('');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      const token = localStorage.getItem('token');
+      try {
+        const response = await fetch('http://localhost:8000/users/me', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        if (!response.ok) {
+          throw new Error('Failed to fetch user profile');
+        }
+        const user = await response.json();
+        setUsername(user.username);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+  
+    fetchUserProfile();
+  }, []);
+  
+  
   const fetchTodos = async () => {
     const response = await api.get("/todos/");
     setTodos(response.data);
   };
+
+
+
 
   useEffect(() => {
     fetchTodos();
@@ -71,7 +98,6 @@ const Todo = () => {
     }
   };
 
-  const navigate = useNavigate();
 
   useEffect(() => {
     const verifyToken = async () => {
@@ -113,7 +139,7 @@ const Todo = () => {
                 className="max-w-[100px] max-md:hidden"
               ></img>
               <p className="text-[#F9F9F9] text-2xl font-semibold	mt-2 ">
-                Olá, Lucas Melo!
+              Olá, {username || 'Usuário'}!
               </p>
             </div>
 
@@ -313,31 +339,6 @@ const Todo = () => {
             </div>
           </form>
         </div>
-        
-
-        {/* <table
-              className="table table-striped table-bordered table-hover max-w-[600px]"
-              style={{ margin: "20px auto" }}
-            >
-              <thead className="text-[white]">
-                <th>titulo</th>
-                <th>Category</th>
-                <th>Description</th>
-                <th>Prioridade?</th>
-                <th>Date</th>
-              </thead>
-              <tbody>
-                {todos.map((todo) => (
-                  <tr key={todo.id}>
-                    <td>{todo.titulo}</td>
-                    <td>{todo.category}</td>
-                    <td>{todo.description}</td>
-                    <td>{todo.is_priority ? "Yes" : "No"}</td>
-                    <td>{todo.date}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table> */}
       </div>
     </div>
     

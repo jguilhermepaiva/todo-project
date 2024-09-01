@@ -166,7 +166,7 @@ function Login() {
             {error && <p style={{ color: "red" }}>{error}</p>}
           </form>
           <form
-            className="max-md:flex max-md:flex-col max-md:items-center max-md:justify-center"
+            className="hidden max-md:flex max-md:flex-col max-md:items-center max-md:justify-center"
             onSubmit={handleRegister}
           >
             <div>

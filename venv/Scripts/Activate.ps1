@@ -118,7 +118,7 @@ Get-PyVenvConfig parses the values from the pyvenv.cfg file located in the
 given folder, and returns them in a map.
 
 For each line in the pyvenv.cfg file, if that line can be parsed into exactly
-two strings separated by `=` (with any titulo of whitespace surrounding the =)
+two strings separated by `=` (with any amount of whitespace surrounding the =)
 then it is considered a `key = value` line. The left hand string is the key,
 the right hand is the value.
 

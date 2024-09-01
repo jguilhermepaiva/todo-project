@@ -61,6 +61,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 class UserCreate(BaseModel):
     username: str
+    email: str
     password: str
 
 def get_user_by_username(db: Session, username: str):
@@ -68,11 +69,11 @@ def get_user_by_username(db: Session, username: str):
 
 def create_user(db: Session, user: UserCreate):
     hashed_password = pwd_context.hash(user.password)
-    db_user = User(username=user.username, hashed_password=hashed_password)
+    db_user = User(username=user.username, email=user.email, hashed_password=hashed_password)  # Adicionando email
     db.add(db_user)
     db.commit()
-    return "complete"
-
+    db.refresh(db_user)
+    return db_user
 
 @app.post("/register")
 def register_user(user: UserCreate, db: Session = Depends(get_db)):

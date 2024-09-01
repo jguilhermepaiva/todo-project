@@ -7,6 +7,7 @@ function Login() {
   const [loginUsername, setLoginUsername] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [registerUsername, setRegisterUsername] = useState("");
+  const [registerEmail, setRegisterEmail] = useState("");
   const [registerPassword, setRegisterPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -60,12 +61,13 @@ function Login() {
   const handleRegister = async (event) => {
     event.preventDefault();
 
-    if (!validateForm(registerUsername, registerPassword)) return;
+    if (!validateForm(registerUsername, registerEmail ,registerPassword)) return;
 
     setLoading(true);
 
     const formDetails = {
       username: registerUsername,
+      email: registerEmail,
       password: registerPassword,
     };
 
@@ -120,7 +122,7 @@ function Login() {
             >
               <div>
                 <label className="text-white text-[20px] font-semibold ">
-                  Email
+                  Login
                 </label>
                 <br />
                 <input
@@ -193,6 +195,23 @@ function Login() {
                   type="text"
                   value={registerUsername}
                   onChange={(e) => setRegisterUsername(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="text-white text-[20px] font-semibold mt-3">
+                  Email
+                </label>
+                <br />
+                <input
+                  className="bg-[#1E1E26] w-[300px] h-[40px] rounded"
+                  style={{
+                    color: "white",
+                    border: "none",
+                    padding: "0 10px",
+                  }}
+                  type="text"
+                  value={registerEmail}
+                  onChange={(e) => setRegisterEmail(e.target.value)}
                 />
               </div>
               <div>

@@ -17,7 +17,7 @@ function Login() {
 
   const validateForm = (username, password) => {
     if (!username || !password) {
-      setError("Username and password are required");
+      setError("Login, email e senha são requeridos!");
       return false;
     }
     setError("");
@@ -116,6 +116,8 @@ function Login() {
           </p>
 
           {isLogin ? (
+            <div>
+              <h2 className="text-white text-[24px] font-semibold text-left mb-5">Faça seu login</h2>
             <form
               className="max-md:flex max-md:flex-col max-md:items-center max-md:justify-center"
               onSubmit={handleSubmit}
@@ -173,9 +175,10 @@ function Login() {
               </button>
               {error && <p style={{ color: "red" }}>{error}</p>}
             </form>
+          </div>
           ) : (
             <div>
-              <h2 className="text-white text-[24px] font-semibold text-center mb-5">Crie sua conta</h2>
+              <h2 className="text-white text-[24px] font-semibold text-left mb-5">Crie sua conta</h2>
             <form
               className="max-md:flex max-md:flex-col max-md:items-center max-md:justify-center"
               onSubmit={handleRegister}

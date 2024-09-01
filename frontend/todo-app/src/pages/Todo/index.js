@@ -8,7 +8,6 @@ import profile from "../../assets/profile.svg";
 import del from "../../assets/delete.png";
 import { useNavigate } from 'react-router-dom';
 
-
 const Todo = () => {
   const [todos, setTodos] = useState([]);
   const [formData, setFormData] = useState({
@@ -20,6 +19,7 @@ const Todo = () => {
   });
 
   const [username, setUsername] = useState('');
+  const [isPopupOpen, setIsPopupOpen] = useState(false); // Estado para o popup
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -44,14 +44,10 @@ const Todo = () => {
     fetchUserProfile();
   }, []);
   
-  
   const fetchTodos = async () => {
     const response = await api.get("/todos/");
     setTodos(response.data);
   };
-
-
-
 
   useEffect(() => {
     fetchTodos();
@@ -60,7 +56,7 @@ const Todo = () => {
   const handleInputChange = (event) => {
     const value =
       event.target.value === "checkbox"
-        ? event.targe.checked
+        ? event.target.checked
         : event.target.value;
     setFormData({
       ...formData,
@@ -79,16 +75,15 @@ const Todo = () => {
       is_priority: false,
       date: "",
     });
+    setIsPopupOpen(false); // Fecha o popup após enviar o formulário
   };
+
   const handleDelete = async (todoId) => {
-    console.log(todoId);
-  
     try {
       const response = await fetch(`http://localhost:8000/todos/${todoId}`, {
         method: 'DELETE',
       });      
       if (response.ok) {
-        console.log("Todo deleted successfully");
         setTodos(todos.filter(todo => todo.id !== todoId));
       } else {
         console.error("Failed to delete the todo. Status:", response.status);
@@ -98,11 +93,9 @@ const Todo = () => {
     }
   };
 
-
   useEffect(() => {
     const verifyToken = async () => {
       const token = localStorage.getItem('token');
-        console.log(token)
       try {
         const response = await fetch(`http://localhost:8000/verify-token/${token}`);
   
@@ -117,87 +110,72 @@ const Todo = () => {
   
     verifyToken();
   }, [navigate]);
-  
+
   return (
-    <div className="bg-[#1E1E26] max-md:bg-[#16161C] pb-10">
+    <div className="bg-[#1E1E26] max-md:bg-[#16161C] pb-10 h-[100vh] ">
       <div className="max-w-[1250px] m-auto">
-        <div className="flex items-center justify-between	m-auto">
-            <a href="http://localhost:3000/">
-            <div className="flex m-4 cursor-pointer" >
-            <img src={back} alt="back" className="mx-3 cursor-pointer"></img>
-            <button className="text-[white]">Sair</button>   
-          </div>
+        <div className="flex items-center justify-between m-auto">
+          <a href="http://localhost:3000/">
+            <div className="flex m-4 cursor-pointer">
+              <img src={back} alt="back" className="mx-3 cursor-pointer"></img>
+              <button className="text-[white]">Sair</button>   
+            </div>
           </a>
           <img src={small_logo} alt="logo" className="mr-8"></img>
         </div>
         <div className="flex justify-between mb-20 max-md:flex-col max-md:items-center min-h-[450px]">
-          <div className="w-1/3 ml-10 flex flex-col justify-between max-md:w-5/6 max-md:justify-start ">
-            <div className="mt-10 ">
+          <div className="w-1/3 ml-10 flex flex-col justify-between max-md:w-5/6 max-md:justify-start">
+            <div className="mt-10">
               <img
                 src={profile}
                 alt="profile"
                 className="max-w-[100px] max-md:hidden"
               ></img>
-              <p className="text-[#F9F9F9] text-2xl font-semibold	mt-2 ">
-              Olá, {username || 'Usuário'}!
+              <p className="text-[#F9F9F9] text-2xl font-semibold mt-3">
+                Olá, {username || 'Usuário'}!
               </p>
             </div>
-
-            {/*lembrar de colocar o nome do user */}
             <div className="flex mt-20 items-center max-md:hidden">
               <img src={medium_logo} alt="logo" className="m-4"></img>
               <div>
                 <p className="text-[#F9F9F9] text-lg">do it!</p>
-                <p className="text-[#F9F9F9] text-sm	">
+                <p className="text-[#F9F9F9] text-sm">
                   seu to do app favorito :)
                 </p>
               </div>
             </div>
           </div>
           <div className="bg-[#16161C] w-2/3 max-md:w-5/6">
-            <div className="flex justify-between mt-3 m-auto w-full  text-white text-[22px] font-semibold">
-              <p className="ml-6 max-md:font-light	max-md:uppercase">Minhas tasks</p>
+            <div className="flex justify-between mt-3 m-auto w-full text-white text-[22px] font-semibold">
+              <p className="ml-6 max-md:font-light max-md:uppercase">Minhas tasks</p>
               <div
-                className="flex items-center justify-center rounded-full w-[40px] h-[40px] mr-6 max-md:hidden"
+                className="flex items-center justify-center rounded-full w-[40px] h-[40px] mr-6 max-md:hidden cursor-pointer"
                 style={{
                   background:
                     "linear-gradient(225deg, #F29682, #EE69AC , #CB4BCF)",
                 }}
+                onClick={() => setIsPopupOpen(true)} // Abre o popup ao clicar no botão "+"
               >
-                <p className="text-white text-2xl	font-normal	">+</p>
+                <p className="text-white text-2xl font-normal">+</p>
               </div>
             </div>
             <ul>
               {todos.map((todo) => (
                 <li key={todo.id} className="todo-item mt-2">
                   <div className="flex justify-between items-center todo-container p-4 bg-[#1A1A1D] rounded-lg mb-3 mx-4">
-                    <div className="flex flex-col	">
-                      <div className="">
-                        <p className="text-[#EE69AC] font-bold">
-                          {todo.titulo}
-                        </p>
+                    <div className="flex flex-col">
+                      <div>
+                        <p className="text-[#EE69AC] font-bold">{todo.titulo}</p>
                       </div>
-                      {/* <div>
-                      <p className="text-white">{todo.category}</p>
-                    </div> */}
                       <div>
                         <p className="text-white">{todo.description}</p>
                       </div>
-
-                      {/* <div>
-                      <p className="text-white">
-                        {todo.is_priority ? "Income" : "Expense"}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-white">{todo.date}</p>
-                    </div> */}
                     </div>
                     <img
                       className="h-[24px] w-[24] cursor-pointer"
                       src={del}
                       alt="delete"
-                      onClick={() => handleDelete(todo.id)} 
+                      onClick={() => handleDelete(todo.id)}
                     ></img>
                   </div>
                 </li>
@@ -205,143 +183,107 @@ const Todo = () => {
             </ul>
             <div className="flex justify-end mt-10">
               <div
-                className="flex items-center justify-center rounded-full w-[40px] h-[40px] mr-6 md:hidden"
+                className="flex items-center justify-center rounded-full w-[40px] h-[40px] mr-6 md:hidden cursor-pointer"
                 style={{
                   background:
                     "linear-gradient(225deg, #F29682, #EE69AC , #CB4BCF)",
                 }}
+                onClick={() => setIsPopupOpen(true)} // Abre o popup ao clicar no botão "+"
               >
-                <p className="text-white text-2xl	font-normal	">+</p>
+                <p className="text-white text-2xl font-normal">+</p>
               </div>
             </div>
           </div>
         </div>
-        
-        <div
-          style={{
-            background: "#16161C",
-            width: "80%",
-            margin: "400px auto",
-            borderRadius: "10px",
-            padding: "25px",
-            color: "white",
-
-          }}
-        >
-          <p
-            className="navbar-brand"
-            style={{ color: "#EE69AC", fontSize: "26px" }}
+        {/* Popup para criar um novo ToDo */}
+        {isPopupOpen && (
+          <div
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+            onClick={() => setIsPopupOpen(false)} // Fecha o popup ao clicar fora dele
           >
-            Criar tarefa
-          </p>
-          <form onSubmit={handleFormSubmit}>
-            <div className="m-3" style={{}}>
-              <p>Título</p>
-              <input
-                type="text"
-                required
-                className="form-control"
-                name="titulo"
-                placeholder="Insira o título da tarefa"
-                value={formData.titulo}
-                onChange={handleInputChange}
-                style={{
-                  background: "#1E1E26",
-                  color: "white",
-                  border: "none",
-                }}
-              />
-            </div>
-            <div className="m-3">
-              <p>Categoria</p>
-              <input
-                type="text"
-                className="form-control"
-                name="category"
-                placeholder="Insira a categoria da tarefa"
-                value={formData.category}
-                onChange={handleInputChange}
-                style={{
-                  background: "#1E1E26",
-                  color: "white",
-                  border: "none",
-                }}
-              />
-            </div>
-            <div className="m-3">
-              <p>Descrição</p>
-              <textarea
-                type="text"
-                rows="4"
-                required
-                className="form-control"
-                name="description"
-                placeholder="Insira a descrição da tarefa"
-                value={formData.description}
-                onChange={handleInputChange}
-                style={{
-                  background: "#1E1E26",
-                  border: "none",
-                  color: "white",
-                }}
-              />
-            </div>
             <div
-              className="m-3"
-              style={{ display: "flex", alignItems: "center" }}
-            >
-              <p style={{ margin: "5px" }}>Prioridade?</p>
-              <input
-                type="checkbox"
-                className=""
-                name="is_priority"
-                value={formData.is_priority}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="m-3">
-              <p style={{ margin: "5px" }}>Prazo</p>
-              <input
-                type="text"
-                className="form-control"
-                name="date"
-                value={formData.date}
-                onChange={handleInputChange}
-                style={{
-                  background: "#1E1E26",
-                  color: "white",
-                  border: "none",
-                }}
-              />
-            </div>
-            <div
-              className="m-3"
+              className="bg-[#16161C] p-8 rounded-lg"
+              onClick={(e) => e.stopPropagation()} // Impede que o clique dentro do popup feche ele
               style={{
-                display: "flex",
-                alignItem: "center",
-                justifyContent: "center",
+                width: "80%",
+                maxWidth: "500px",
               }}
             >
-              <button
-                type="submit"
-                style={{
-                  color: "white",
-                  padding: "10px 100px",
-                  border: "none",
-                  borderRadius: "5px",
-                  background:
-                    "linear-gradient(225deg, #F29682, #EE69AC , #CB4BCF)",
-                  fontWeight: "400",
-                }}
+              <p
+                className="text-[#EE69AC] text-2xl font-semibold mb-4"
               >
-                Adicionar
-              </button>
+                Criar tarefa
+              </p>
+              <form onSubmit={handleFormSubmit}>
+                <div className="mb-4">
+                  <p className="text-white">Título</p>
+                  <input
+                    type="text"
+                    required
+                    className="w-full p-2 mt-1 rounded bg-[#1E1E26] text-white border-none"
+                    name="titulo"
+                    placeholder="Insira o título da tarefa"
+                    value={formData.titulo}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="mb-4">
+                  <p className="text-white">Categoria</p>
+                  <input
+                    type="text"
+                    className="w-full p-2 mt-1 rounded bg-[#1E1E26] text-white border-none"
+                    name="category"
+                    placeholder="Insira a categoria da tarefa"
+                    value={formData.category}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="mb-4">
+                  <p className="text-white">Descrição</p>
+                  <textarea
+                    className="w-full p-2 mt-1 rounded bg-[#1E1E26] text-white border-none"
+                    name="description"
+                    placeholder="Insira a descrição da tarefa"
+                    value={formData.description}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="text-white inline-flex items-center">
+                    <input
+                      type="checkbox"
+                      className="form-checkbox text-pink-600"
+                      name="is_priority"
+                      checked={formData.is_priority}
+                      onChange={handleInputChange}
+                    />
+                    <span className="ml-2">Prioridade</span>
+                  </label>
+                </div>
+                <div className="mb-4">
+                  <p className="text-white">Data</p>
+                  <input
+                    type="date"
+                    className="w-full p-2 mt-1 rounded bg-[#1E1E26] text-white border-none"
+                    name="date"
+                    value={formData.date}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="flex justify-end">
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-[#EE69AC] text-white rounded hover:bg-pink-700"
+                  >
+                    Criar
+                  </button>
+                </div>
+              </form>
             </div>
-          </form>
-        </div>
+          </div>
+        )}
       </div>
     </div>
-    
   );
 };
 

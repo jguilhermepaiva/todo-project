@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 
 const Todo = () => {
   const [todos, setTodos] = useState([]);
+  const [expandedTodo, setExpandedTodo] = useState(null); // Estado para controlar o accordion
   const [formData, setFormData] = useState({
     titulo: "",
     category: "",
@@ -21,6 +22,8 @@ const Todo = () => {
   const [username, setUsername] = useState('');
   const [isPopupOpen, setIsPopupOpen] = useState(false); // Estado para o popup
   const navigate = useNavigate();
+
+  
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -93,6 +96,10 @@ const Todo = () => {
     }
   };
 
+  const toggleAccordion = (todoId) => {
+    setExpandedTodo(expandedTodo === todoId ? null : todoId);
+  };
+
   useEffect(() => {
     const verifyToken = async () => {
       const token = localStorage.getItem('token');
@@ -162,7 +169,7 @@ const Todo = () => {
             <ul>
               {todos.map((todo) => (
                 <li key={todo.id} className="todo-item mt-2">
-                  <div className="flex justify-between items-center todo-container p-4 bg-[#1A1A1D] rounded-lg mb-3 mx-4">
+                  <div className="flex justify-between items-center todo-container p-4 bg-[#1A1A1D] rounded-lg mb-3 mx-4 cursor-pointer" onClick={() => toggleAccordion(todo.id)} >
                     <div className="flex flex-col">
                       <div>
                         <p className="text-[#EE69AC] font-bold">{todo.titulo}</p>
@@ -170,6 +177,13 @@ const Todo = () => {
                       <div>
                         <p className="text-white">{todo.description}</p>
                       </div>
+                      {expandedTodo === todo.id && ( // Verifica se o ToDo está expandido
+                        <div className="text-white mt-2">
+                          <p>{todo.category}</p>
+                          <p>{todo.is_priority ? "É prioridade" : "Não é prioridade"}</p>
+                          <p>{todo.date}</p>
+                        </div>
+                      )}
                     </div>
                     <img
                       className="h-[24px] w-[24] cursor-pointer"
@@ -227,7 +241,7 @@ const Todo = () => {
                     onChange={handleInputChange}
                   />
                 </div>
-                <div className="mb-4">
+                {/* <div className="mb-4">
                   <p className="text-white">Categoria</p>
                   <input
                     type="text"
@@ -237,7 +251,7 @@ const Todo = () => {
                     value={formData.category}
                     onChange={handleInputChange}
                   />
-                </div>
+                </div> */}
                 <div className="mb-4">
                   <p className="text-white">Descrição</p>
                   <textarea

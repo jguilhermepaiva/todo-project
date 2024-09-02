@@ -170,50 +170,57 @@ const Todo = () => {
               </div>
             </div>
             <ul>
-              {todos.map((todo) => (
-                <li key={todo.id} className="todo-item mt-2">
-                  <div
-                    className="flex justify-between items-center todo-container p-4 bg-[#1A1A1D] rounded-lg mb-3 mx-4 cursor-pointer"
-                    onClick={() => toggleAccordion(todo.id)}
-                  >
-                    <div className="flex flex-col">
-                      <div>
-                        <p className="text-[#EE69AC] font-bold">
-                          {todo.titulo}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-white">{todo.description}</p>
-                      </div>
-                      {expandedTodo === todo.id && ( // Verifica se o ToDo está expandido
-                        <div className="text-white mt-2">
-                          <p>{todo.category}</p>
-                          <p>
-                            {todo.is_priority
-                              ? "É prioridade"
-                              : "Não é prioridade"}
+              {todos
+                .sort((a, b) => b.is_priority - a.is_priority)
+                .map((todo) => (
+                  <li key={todo.id} className="todo-item mt-2">
+                    <div
+                      className="flex justify-between items-center todo-container p-4 bg-[#1A1A1D] rounded-lg mb-3 mx-4 cursor-pointer"
+                      onClick={() => toggleAccordion(todo.id)}
+                    >
+                      <div className="flex flex-col">
+                        <div>
+                          <p className="text-[#EE69AC] font-bold">
+                            {todo.titulo}
                           </p>
-                          <p>{todo.date}</p>
                         </div>
-                      )}
+                        <div>
+                          <p className="text-white">{todo.description}</p>
+                        </div>
+                        {expandedTodo === todo.id && ( // Verifica se o ToDo está expandido
+                          <div className="text-white mt-2">
+                            <p>{todo.category}</p>
+                            <p>
+                              {todo.is_priority
+                                ? "É prioridade"
+                                : "Não é prioridade"}
+                            </p>
+                            <p>{todo.date}</p>
+                          </div>
+                        )}
+                      </div>
+                      <div className="">
+                        <img
+                          className={`${
+                            todo.is_priority
+                              ? "h-[24px] w-[24] mt-[-22px] mb-[8px]"
+                              : "h-[24px] w-[24] hidden"
+                          }`}
+                          src={highest}
+                          alt="prioridade"
+                        ></img>
+                        <img
+                          className="h-[24px] w-[24] cursor-pointer"
+                          src={del}
+                          alt="delete"
+                          onClick={() => handleDelete(todo.id)}
+                        ></img>
+                      </div>
                     </div>
-                    <div className="">
-                    <img
-                      className={`${todo.is_priority ? "h-[24px] w-[24] mt-[-22px] mb-[8px]" : "h-[24px] w-[24] hidden"}`}
-                      src={highest}
-                      alt="prioridade"
-                    ></img>
-                    <img
-                      className="h-[24px] w-[24] cursor-pointer"
-                      src={del}
-                      alt="delete"
-                      onClick={() => handleDelete(todo.id)}
-                    ></img>
-                    </div>
-                  </div>
-                </li>
-              ))}
+                  </li>
+                ))}
             </ul>
+
             <div className="flex justify-end mt-10">
               <div
                 className="flex items-center justify-center rounded-full w-[40px] h-[40px] mr-6 md:hidden cursor-pointer "

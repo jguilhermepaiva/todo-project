@@ -143,7 +143,11 @@ async def verify_user_token(token: str):
 def get_user_by_username(db: Session, username: str):
     return db.query(User).filter(User.username == username).first()
 
-@app.get("/users/me", response_model=UserCreate)
+class UserResponse(BaseModel):
+    username: str
+    email: str
+
+@app.get("/users/me", response_model=UserResponse)
 def read_users_me(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     payload = verify_token(token)
     username: str = payload.get("sub")
@@ -152,7 +156,8 @@ def read_users_me(token: str = Depends(oauth2_scheme), db: Session = Depends(get
     user = get_user_by_username(db, username)
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
-    return user
+    return UserResponse(username=user.username, email=user.email)
+
 
 
 

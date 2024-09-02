@@ -8,6 +8,7 @@ import profile from "../../assets/profile.svg";
 import del from "../../assets/delete.png";
 import highest from "../../assets/highest.svg";
 import { useNavigate } from "react-router-dom";
+import axios from 'axios';
 
 const Todo = () => {
   const [todos, setTodos] = useState([]);
@@ -50,33 +51,32 @@ const Todo = () => {
     return str.charAt(0).toUpperCase() + str.slice(1);
   };
 
+
   const fetchTodos = async () => {
-    const response = await api.get("/todos/");
-    const sortedTodos = response.data.sort((a, b) => {
-      if (b.is_priority !== a.is_priority) {
-        return b.is_priority - a.is_priority;
-      }
-      const dateA = a.date ? new Date(a.date) : null;
-      const dateB = b.date ? new Date(b.date) : null;
-
-      if (dateA && dateB) {
-        return dateA - dateB;
-      }
-
-      if (dateA && !dateB) {
-        return -1;
-      }
-      if (!dateA && dateB) {
-        return 1;
-      }
-
-      return 0;
-    });
-    setTodos(sortedTodos);
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("No token found");
+      return;
+    }
+  
+    try {
+      const response = await axios.get("http://localhost:8000/todos/", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      // Atualiza o estado todos com os dados retornados
+      setTodos(response.data);
+    } catch (error) {
+      console.error("Failed to fetch todos:", error);
+    }
   };
+  
   useEffect(() => {
     fetchTodos();
   }, []);
+  
 
   const handleInputChange = (event) => {
     const value =
@@ -91,37 +91,70 @@ const Todo = () => {
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
-    await api.post("/todos/", formData);
-    fetchTodos();
-    setFormData({
-      titulo: "",
-      category: "",
-      description: "",
-      is_priority: false,
-      date: "",
-    });
-    setIsPopupOpen(false); // Fecha o popup após enviar o formulário
-  };
 
-  const handleDelete = async (todoId) => {
-    try {
-      const response = await fetch(`http://localhost:8000/todos/${todoId}`, {
-        method: "DELETE",
-      });
-      if (response.ok) {
-        setTodos(todos.filter((todo) => todo.id !== todoId));
-      } else {
-        console.error("Failed to delete the todo. Status:", response.status);
-      }
-    } catch (error) {
-      console.error("Error deleting todo:", error);
+    const token = localStorage.getItem('token');
+    if (!token) {
+        console.error("No authentication token found");
+        return;
     }
-  };
+
+    try {
+        // Inclua o token no cabeçalho da requisição
+        await axios.post(
+            "http://localhost:8000/todos/",
+            formData,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`, // Adiciona o token ao cabeçalho
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+
+        fetchTodos(); // Atualiza a lista de ToDos após a criação
+        setFormData({
+            titulo: "",
+            category: "",
+            description: "",
+            is_priority: false,
+            date: "",
+        });
+        setIsPopupOpen(false); // Fecha o popup após enviar o formulário
+    } catch (error) {
+        console.error('Erro ao criar a ToDo:', error);
+        // Você pode adicionar um feedback de erro ao usuário aqui
+    }
+};
+
+const handleDelete = async (todoId) => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    console.error("No token found");
+    return;
+  }
+
+  try {
+    const response = await fetch(`http://localhost:8000/todos/${todoId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`, // Inclui o token no cabeçalho
+      },
+    });
+
+    if (response.ok) {
+      setTodos(todos.filter((todo) => todo.id !== todoId));
+    } else {
+      console.error("Failed to delete the todo. Status:", response.status);
+    }
+  } catch (error) {
+    console.error("Error deleting todo:", error);
+  }
+};
 
   const toggleAccordion = (todoId) => {
     setExpandedTodo(expandedTodo === todoId ? null : todoId);
   };
-
+  
   useEffect(() => {
     const verifyToken = async () => {
       const token = localStorage.getItem("token");

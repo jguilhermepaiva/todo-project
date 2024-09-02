@@ -172,16 +172,39 @@ models.Base.metadata.create_all(bind=engine)
 
 
 @app.post("/todos/", response_model=TodoModel)
-async def create_todo(todo: TodoBase, db: db_dependency):
-    db_todo = models.Todo(**todo.model_dump())
+async def create_todo(
+    todo: TodoBase, 
+    db: db_dependency, 
+    token: str = Depends(oauth2_scheme)
+):
+    payload = verify_token(token)
+    username: str = payload.get("sub")
+    user = get_user_by_username(db, username)
+    
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    db_todo = models.Todo(**todo.model_dump(), user_id=user.id)
     db.add(db_todo)
     db.commit()
     db.refresh(db_todo)
     return db_todo
 
 @app.get("/todos/", response_model=List[TodoModel])
-async def read_todos(db: db_dependency, skip: int = 0, limit: int = 100):
-    todos = db.query(models.Todo).offset(skip).limit(limit).all()
+async def read_todos(
+    db: db_dependency, 
+    token: str = Depends(oauth2_scheme),
+    skip: int = 0, 
+    limit: int = 100
+):
+    payload = verify_token(token)
+    username: str = payload.get("sub")
+    user = get_user_by_username(db, username)
+
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    todos = db.query(models.Todo).filter(models.Todo.user_id == user.id).offset(skip).limit(limit).all()
     return todos
 
 @app.delete("/todos/{todo_id}", response_model=TodoModel)

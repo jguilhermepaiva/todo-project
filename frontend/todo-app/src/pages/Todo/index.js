@@ -139,8 +139,8 @@ const Todo = () => {
   }, [navigate]);
 
   return (
-    <div className="bg-[#1E1E26] max-md:bg-[#16161C] pb-10 h-[100vh] ">
-      <div className="max-w-[1250px] m-auto">
+    <div className="bg-[#1E1E26] max-md:bg-[#16161C] pb-10 h-[100vh] pt-[8%]">
+      <div className="max-w-[1250px] mx-auto ">
         <div className="flex items-center justify-between m-auto">
           <a href="http://localhost:3000/">
             <div className="flex m-4 cursor-pointer">

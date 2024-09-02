@@ -11,7 +11,17 @@
 ::-webkit-input-placeholder { 
   color: #F9F9F9 !important;
 }
-
+::-webkit-scrollbar-track {
+  background-color: #F4F4F4;
+}
+::-webkit-scrollbar {
+  width: 10px;
+  background: #F4F4F4;
+}
+::-webkit-scrollbar-thumb {
+  background: #bfbdbd;
+  border-radius: 10px;
+}
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;

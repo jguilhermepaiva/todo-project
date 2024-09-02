@@ -48,9 +48,28 @@ const Todo = () => {
 
   const fetchTodos = async () => {
     const response = await api.get("/todos/");
-    setTodos(response.data);
-  };
+    const sortedTodos = response.data.sort((a, b) => {
+      if (b.is_priority !== a.is_priority) {
+        return b.is_priority - a.is_priority;
+      }
+      const dateA = a.date ? new Date(a.date) : null;
+      const dateB = b.date ? new Date(b.date) : null;
 
+      if (dateA && dateB) {
+        return dateA - dateB;
+      }
+
+      if (dateA && !dateB) {
+        return -1; 
+      }
+      if (!dateA && dateB) {
+        return 1; 
+      }
+
+      return 0;
+    });
+    setTodos(sortedTodos);
+  };
   useEffect(() => {
     fetchTodos();
   }, []);
@@ -153,7 +172,7 @@ const Todo = () => {
               </div>
             </div>
           </div>
-          <div className="bg-[#16161C] w-2/3 max-md:w-5/6">
+          <div className="bg-[#16161C] w-2/3 max-md:w-5/6 max-h-[60vh] overflow-auto">
             <div className="flex justify-between my-3 m-auto w-full text-white text-[22px] font-semibold">
               <p className="ml-6 max-md:font-light max-md:uppercase">
                 Minhas tasks
@@ -164,7 +183,7 @@ const Todo = () => {
                   background:
                     "linear-gradient(225deg, #F29682, #EE69AC , #CB4BCF)",
                 }}
-                onClick={() => setIsPopupOpen(true)} // Abre o popup ao clicar no botão "+"
+                onClick={() => setIsPopupOpen(true)} 
               >
                 <p className="text-white text-2xl font-normal">+</p>
               </div>

@@ -64,10 +64,10 @@ const Todo = () => {
       }
 
       if (dateA && !dateB) {
-        return -1; 
+        return -1;
       }
       if (!dateA && dateB) {
-        return 1; 
+        return 1;
       }
 
       return 0;
@@ -146,12 +146,17 @@ const Todo = () => {
     <div className="bg-[#1E1E26] max-md:bg-[#16161C] pb-10 h-[100vh] pt-[8%]">
       <div className="max-w-[1250px] mx-auto ">
         <div className="flex items-center justify-between m-auto">
-          <a href="http://localhost:3000/">
-            <div className="flex m-4 cursor-pointer">
-              <img src={back} alt="back" className="mx-3 cursor-pointer"></img>
-              <button className="text-[white]">Sair</button>
-            </div>
-          </a>
+          <div
+            className="flex m-4 cursor-pointer"
+            onClick={() => {
+              localStorage.removeItem("token");
+              navigate("/"); // Redireciona para a página de login
+            }}
+          >
+            <img src={back} alt="back" className="mx-3 cursor-pointer"></img>
+            <button className="text-[white]">Sair</button>
+          </div>
+
           <img src={small_logo} alt="logo" className="mr-8"></img>
         </div>
         <div className="flex justify-between mb-20 max-md:flex-col max-md:items-center min-h-[450px]">
@@ -187,7 +192,7 @@ const Todo = () => {
                   background:
                     "linear-gradient(225deg, #F29682, #EE69AC , #CB4BCF)",
                 }}
-                onClick={() => setIsPopupOpen(true)} 
+                onClick={() => setIsPopupOpen(true)}
               >
                 <p className="text-white text-2xl font-normal">+</p>
               </div>

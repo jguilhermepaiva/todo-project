@@ -8,13 +8,11 @@ import models
 from models import User
 from fastapi.middleware.cors import CORSMiddleware
 from routers import auth
-# from routers.auth import get_current_user
 from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
 from jose import jwt, JWTError
 
 app = FastAPI()
-# app.include_router(auth.router)
 
 origins = [
     'http://localhost:3000',
@@ -51,7 +49,6 @@ def get_db():
         db.close()
 
 db_dependency = Annotated[Session, Depends(get_db)]
-# user_dependency = Annotated[dict, Depends(get_current_user)]
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
@@ -89,7 +86,6 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Username already registered")
     return create_user(db=db, user=user)
 
-# Authenticate the user
 def authenticate_user(username: str, password: str, db: Session):
     user = db.query(User).filter(User.username == username).first()
     if not user:
@@ -98,7 +94,6 @@ def authenticate_user(username: str, password: str, db: Session):
         return False
     return user
 
-# Create access token
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()
     if expires_delta:
@@ -163,13 +158,6 @@ def read_users_me(token: str = Depends(oauth2_scheme), db: Session = Depends(get
 
 
 models.Base.metadata.create_all(bind=engine)
-
-# @app.get("/", status_code=status.HTTP_200_OK)
-# async def user(user: None, db: db_dependency):
-#     if user is None:
-#         raise HTTPException(status_code=401, detail='Authentication failed')
-#     return {"User": user}
-
 
 @app.post("/todos/", response_model=TodoModel)
 async def create_todo(

@@ -12,7 +12,7 @@ import axios from "axios";
 
 const Todo = () => {
   const [todos, setTodos] = useState([]);
-  const [expandedTodo, setExpandedTodo] = useState(null); // Estado para controlar o accordion
+  const [expandedTodo, setExpandedTodo] = useState(null); 
   const [formData, setFormData] = useState({
     titulo: "",
     category: "",
@@ -22,7 +22,7 @@ const Todo = () => {
   });
 
   const [username, setUsername] = useState("");
-  const [isPopupOpen, setIsPopupOpen] = useState(false); // Estado para o popup
+  const [isPopupOpen, setIsPopupOpen] = useState(false); 
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -65,7 +65,6 @@ const Todo = () => {
         },
       });
 
-      // Atualiza o estado todos com os dados retornados
       setTodos(response.data);
     } catch (error) {
       console.error("Failed to fetch todos:", error);
@@ -97,15 +96,14 @@ const Todo = () => {
     }
 
     try {
-      // Inclua o token no cabeçalho da requisição
       await axios.post("http://localhost:8000/todos/", formData, {
         headers: {
-          Authorization: `Bearer ${token}`, // Adiciona o token ao cabeçalho
+          Authorization: `Bearer ${token}`, 
           "Content-Type": "application/json",
         },
       });
 
-      fetchTodos(); // Atualiza a lista de ToDos após a criação
+      fetchTodos(); 
       setFormData({
         titulo: "",
         category: "",
@@ -113,10 +111,9 @@ const Todo = () => {
         is_priority: false,
         date: "",
       });
-      setIsPopupOpen(false); // Fecha o popup após enviar o formulário
+      setIsPopupOpen(false); 
     } catch (error) {
       console.error("Erro ao criar a ToDo:", error);
-      // Você pode adicionar um feedback de erro ao usuário aqui
     }
   };
 
@@ -131,7 +128,7 @@ const Todo = () => {
       const response = await fetch(`http://localhost:8000/todos/${todoId}`, {
         method: "DELETE",
         headers: {
-          Authorization: `Bearer ${token}`, // Inclui o token no cabeçalho
+          Authorization: `Bearer ${token}`, 
         },
       });
 
@@ -208,7 +205,7 @@ const Todo = () => {
               </div>
             </div>
           </div>
-          <div className="bg-[#16161C] w-2/3 max-md:w-5/6  max-md:h-[50vh]">
+          <div className="bg-[#16161C] w-2/3 max-md:w-5/6  max-md:h-[50vh] md:mr-10">
             <div className="flex justify-between my-3 m-auto w-full text-white text-[22px] font-semibold">
               <p className="ml-6 max-md:font-light max-md:uppercase">
                 Minhas tasks
@@ -264,7 +261,7 @@ const Todo = () => {
                         <div>
                           <p className="text-white">{todo.description}</p>
                         </div>
-                        {expandedTodo === todo.id && ( // Verifica se o ToDo está expandido
+                        {expandedTodo === todo.id && ( 
                           <div className="text-white mt-2">
                             <p>{todo.category}</p>
                             <p>
@@ -305,22 +302,22 @@ const Todo = () => {
                   background:
                     "linear-gradient(225deg, #F29682, #EE69AC , #CB4BCF)",
                 }}
-                onClick={() => setIsPopupOpen(true)} // Abre o popup ao clicar no botão "+"
+                onClick={() => setIsPopupOpen(true)} 
               >
                 <p className="text-white text-2xl font-normal">+</p>
               </div>
             </div>
           </div>
         </div>
-        {/* Popup para criar um novo ToDo */}
+       
         {isPopupOpen && (
           <div
             className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
-            onClick={() => setIsPopupOpen(false)} // Fecha o popup ao clicar fora dele
+            onClick={() => setIsPopupOpen(false)} 
           >
             <div
               className="bg-[#16161C] p-8 rounded-lg"
-              onClick={(e) => e.stopPropagation()} // Impede que o clique dentro do popup feche ele
+              onClick={(e) => e.stopPropagation()} 
               style={{
                 width: "80%",
                 maxWidth: "500px",

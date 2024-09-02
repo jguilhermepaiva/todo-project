@@ -172,7 +172,7 @@ const Todo = () => {
               </div>
             </div>
           </div>
-          <div className="bg-[#16161C] w-2/3 max-md:w-5/6 max-h-[60vh] overflow-auto">
+          <div className="bg-[#16161C] w-2/3 max-md:w-5/6  ">
             <div className="flex justify-between my-3 m-auto w-full text-white text-[22px] font-semibold">
               <p className="ml-6 max-md:font-light max-md:uppercase">
                 Minhas tasks
@@ -188,7 +188,7 @@ const Todo = () => {
                 <p className="text-white text-2xl font-normal">+</p>
               </div>
             </div>
-            <ul>
+            <ul className="md:max-h-[45vh] max-md:max-h-[65vh] overflow-auto">
               {todos
                 .sort((a, b) => b.is_priority - a.is_priority)
                 .map((todo) => (

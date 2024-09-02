@@ -8,6 +8,7 @@ import profile from "../../assets/profile.svg";
 import del from "../../assets/delete.png";
 import highest from "../../assets/highest.svg";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Todo = () => {
   const [todos, setTodos] = useState([]);
@@ -51,29 +52,26 @@ const Todo = () => {
   };
 
   const fetchTodos = async () => {
-    const response = await api.get("/todos/");
-    const sortedTodos = response.data.sort((a, b) => {
-      if (b.is_priority !== a.is_priority) {
-        return b.is_priority - a.is_priority;
-      }
-      const dateA = a.date ? new Date(a.date) : null;
-      const dateB = b.date ? new Date(b.date) : null;
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("No token found");
+      return;
+    }
 
-      if (dateA && dateB) {
-        return dateA - dateB;
-      }
+    try {
+      const response = await axios.get("http://localhost:8000/todos/", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-      if (dateA && !dateB) {
-        return -1;
-      }
-      if (!dateA && dateB) {
-        return 1;
-      }
-
-      return 0;
-    });
-    setTodos(sortedTodos);
+      // Atualiza o estado todos com os dados retornados
+      setTodos(response.data);
+    } catch (error) {
+      console.error("Failed to fetch todos:", error);
+    }
   };
+
   useEffect(() => {
     fetchTodos();
   }, []);
@@ -91,23 +89,52 @@ const Todo = () => {
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
-    await api.post("/todos/", formData);
-    fetchTodos();
-    setFormData({
-      titulo: "",
-      category: "",
-      description: "",
-      is_priority: false,
-      date: "",
-    });
-    setIsPopupOpen(false); // Fecha o popup após enviar o formulário
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("No authentication token found");
+      return;
+    }
+
+    try {
+      // Inclua o token no cabeçalho da requisição
+      await axios.post("http://localhost:8000/todos/", formData, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Adiciona o token ao cabeçalho
+          "Content-Type": "application/json",
+        },
+      });
+
+      fetchTodos(); // Atualiza a lista de ToDos após a criação
+      setFormData({
+        titulo: "",
+        category: "",
+        description: "",
+        is_priority: false,
+        date: "",
+      });
+      setIsPopupOpen(false); // Fecha o popup após enviar o formulário
+    } catch (error) {
+      console.error("Erro ao criar a ToDo:", error);
+      // Você pode adicionar um feedback de erro ao usuário aqui
+    }
   };
 
   const handleDelete = async (todoId) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("No token found");
+      return;
+    }
+
     try {
       const response = await fetch(`http://localhost:8000/todos/${todoId}`, {
         method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`, // Inclui o token no cabeçalho
+        },
       });
+
       if (response.ok) {
         setTodos(todos.filter((todo) => todo.id !== todoId));
       } else {
@@ -199,7 +226,29 @@ const Todo = () => {
             </div>
             <ul className="md:max-h-[45vh] max-md:max-h-[65vh] overflow-auto">
               {todos
-                .sort((a, b) => b.is_priority - a.is_priority)
+                .sort((a, b) => {
+                  if (a.is_priority && b.is_priority) {
+                    if (a.date && b.date) {
+                      return new Date(a.date) - new Date(b.date); 
+                    } else if (a.date) {
+                      return -1; 
+                    } else if (b.date) {
+                      return 1; 
+                    }
+                    return 0; 
+                  } else if (a.is_priority) {
+                    return -1; 
+                  } else if (b.is_priority) {
+                    return 1; 
+                  } else if (a.date && b.date) {
+                    return new Date(a.date) - new Date(b.date); 
+                  } else if (a.date) {
+                    return -1; 
+                  } else if (b.date) {
+                    return 1; 
+                  }
+                  return 0; 
+                })
                 .map((todo) => (
                   <li key={todo.id} className="todo-item mt-2">
                     <div

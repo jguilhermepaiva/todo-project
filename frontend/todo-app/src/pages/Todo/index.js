@@ -46,6 +46,10 @@ const Todo = () => {
     fetchUserProfile();
   }, []);
 
+  const capitalize = (str) => {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  };
+
   const fetchTodos = async () => {
     const response = await api.get("/todos/");
     const sortedTodos = response.data.sort((a, b) => {
@@ -159,7 +163,7 @@ const Todo = () => {
                 className="max-w-[100px] max-md:hidden"
               ></img>
               <p className="text-[#F9F9F9] text-2xl font-semibold mt-3">
-                Olá, {username || "Usuário"}!
+                Olá, {capitalize(username) || "Usuário"}!
               </p>
             </div>
             <div className="flex mt-20 items-center max-md:hidden">

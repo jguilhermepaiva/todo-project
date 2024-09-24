@@ -35,7 +35,7 @@ function Login() {
     formDetails.append("password", loginPassword);
 
     try {
-      const response = await fetch("https://todo-project-backend-lgyz.onrender.com/token", {
+      const response = await fetch("http://localhost:8000/token", {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
@@ -74,7 +74,7 @@ function Login() {
     };
 
     try {
-      const response = await fetch("https://todo-project-backend-lgyz.onrender.com/register", {
+      const response = await fetch("http://localhost:8000/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

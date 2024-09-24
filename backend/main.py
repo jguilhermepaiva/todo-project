@@ -12,12 +12,7 @@ from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
 from jose import jwt, JWTError
 
-app = FastAPI(
-    docs_url="/docs",  # URL da documentação Swagger
-    redoc_url="/redoc",  # URL da documentação Redoc
-    title="Minha API",  # Título opcional
-    description="Descrição da API",  # Descrição opcional
-)
+app = FastAPI()
 
 origins = [
     'http://localhost:3000',
@@ -27,7 +22,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -83,10 +78,6 @@ def create_user(db: Session, user: UserCreate):
     db.commit()
     db.refresh(db_user)
     return db_user
-
-@app.get("/")
-def read_root():
-    return {"message": "Welcome to the API!"}
 
 @app.post("/register")
 def register_user(user: UserCreate, db: Session = Depends(get_db)):

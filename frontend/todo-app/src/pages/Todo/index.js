@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import api from "../../api";
 import "./Todo.css";
 import back from "../../assets/back.svg";
 import small_logo from "../../assets/small_logo.svg";
@@ -28,12 +29,11 @@ const Todo = () => {
     const fetchUserProfile = async () => {
       const token = localStorage.getItem("token");
       try {
-        const response = await fetch("https://todo-project-backend-lgyz.onrender.com/users/me", {
+        const response = await fetch("http://localhost:8000/users/me", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        
         if (!response.ok) {
           throw new Error("Failed to fetch user profile");
         }
@@ -59,7 +59,7 @@ const Todo = () => {
     }
 
     try {
-      const response = await fetch("https://todo-project-backend-lgyz.onrender.com/users/me", {
+      const response = await axios.get("http://localhost:8000/todos/", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -96,7 +96,7 @@ const Todo = () => {
     }
 
     try {
-      await axios.post("https://todo-project-backend-lgyz.onrender.com/todos/", formData, {
+      await axios.post("http://localhost:8000/todos/", formData, {
         headers: {
           Authorization: `Bearer ${token}`, 
           "Content-Type": "application/json",
@@ -125,7 +125,7 @@ const Todo = () => {
     }
 
     try {
-      const response = await fetch(`https://todo-project-backend-lgyz.onrender.com/todos/${todoId}`, {
+      const response = await fetch(`http://localhost:8000/todos/${todoId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`, 
@@ -151,7 +151,7 @@ const Todo = () => {
       const token = localStorage.getItem("token");
       try {
         const response = await fetch(
-          `https://todo-project-backend-lgyz.onrender.com/verify-token/${token}`
+          `http://localhost:8000/verify-token/${token}`
         );
 
         if (!response.ok) {
@@ -252,14 +252,14 @@ const Todo = () => {
                       className="flex justify-between items-center todo-container p-4 bg-[#1A1A1D] rounded-lg mb-3 mx-4 cursor-pointer"
                       onClick={() => toggleAccordion(todo.id)}
                     >
-                      <div className="flex flex-col max-w-[90%]">
+                      <div className="flex flex-col">
                         <div>
                           <p className="text-[#EE69AC] font-bold">
                             {todo.titulo}
                           </p>
                         </div>
-                        <div className="">
-                          <p className="text-white ">{todo.description}</p>
+                        <div>
+                          <p className="text-white">{todo.description}</p>
                         </div>
                         {expandedTodo === todo.id && ( 
                           <div className="text-white mt-2">

@@ -28,11 +28,12 @@ const Todo = () => {
     const fetchUserProfile = async () => {
       const token = localStorage.getItem("token");
       try {
-        const response = await fetch("http://localhost:8000/users/me", {
+        const response = await fetch("https://todo-project-backend-lgyz.onrender.com/users/me", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
+        
         if (!response.ok) {
           throw new Error("Failed to fetch user profile");
         }
@@ -58,7 +59,7 @@ const Todo = () => {
     }
 
     try {
-      const response = await axios.get("http://localhost:8000/todos/", {
+      const response = await fetch("https://todo-project-backend-lgyz.onrender.com/users/me", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -95,7 +96,7 @@ const Todo = () => {
     }
 
     try {
-      await axios.post("http://localhost:8000/todos/", formData, {
+      await axios.post("https://todo-project-backend-lgyz.onrender.com/todos/", formData, {
         headers: {
           Authorization: `Bearer ${token}`, 
           "Content-Type": "application/json",
@@ -124,7 +125,7 @@ const Todo = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:8000/todos/${todoId}`, {
+      const response = await fetch(`https://todo-project-backend-lgyz.onrender.com/todos/${todoId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`, 
@@ -150,7 +151,7 @@ const Todo = () => {
       const token = localStorage.getItem("token");
       try {
         const response = await fetch(
-          `http://localhost:8000/verify-token/${token}`
+          `https://todo-project-backend-lgyz.onrender.com/verify-token/${token}`
         );
 
         if (!response.ok) {

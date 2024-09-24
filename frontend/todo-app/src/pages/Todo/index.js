@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import api from "../../api";
 import "./Todo.css";
 import back from "../../assets/back.svg";
 import small_logo from "../../assets/small_logo.svg";
@@ -252,14 +251,14 @@ const Todo = () => {
                       className="flex justify-between items-center todo-container p-4 bg-[#1A1A1D] rounded-lg mb-3 mx-4 cursor-pointer"
                       onClick={() => toggleAccordion(todo.id)}
                     >
-                      <div className="flex flex-col">
+                      <div className="flex flex-col max-w-[90%]">
                         <div>
                           <p className="text-[#EE69AC] font-bold">
                             {todo.titulo}
                           </p>
                         </div>
-                        <div>
-                          <p className="text-white">{todo.description}</p>
+                        <div className="">
+                          <p className="text-white ">{todo.description}</p>
                         </div>
                         {expandedTodo === todo.id && ( 
                           <div className="text-white mt-2">

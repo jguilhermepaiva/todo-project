@@ -10,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
 from jose import jwt, JWTError
+import os
 
 # O Render executa isto quando o serviço inicia
 Base.metadata.create_all(bind=engine)
@@ -50,8 +51,8 @@ db_dependency = Annotated[Session, Depends(get_db)]
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
-SECRET_KEY = '1a64das6545123af132sf456a4f89a99f8a78f9asf54a987fa89s'
-ALGORITHM = 'HS256'
+SECRET_KEY = os.getenv("SECRET_KEY", "uma_chave_padrao_para_desenvolvimento")
+ALGORITHM = os.getenv("ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 class UserCreate(BaseModel):

@@ -3,26 +3,24 @@ from typing import Annotated, List
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
-from database import SessionLocal, engine
+from database import SessionLocal, engine, Base # Importa Base
 import models
 from models import User
 from fastapi.middleware.cors import CORSMiddleware
-from routers import auth
 from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
 from jose import jwt, JWTError
 
-app = FastAPI()
+# O Render executa isto quando o serviço inicia
+Base.metadata.create_all(bind=engine)
 
-origins = [
-    'http://localhost:3000',
-]
+app = FastAPI()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -9,8 +9,8 @@ Bem-vindo ao "Do It!", uma aplicação full-stack de lista de tarefas construíd
 
 A aplicação está totalmente funcional e hospedada na nuvem.
 
-* **Frontend (Vercel):** [**Aceda à aplicação aqui!**]([https://seu-link-do-vercel.app](https://todo-project-three-omega.vercel.app/))
-* **Backend (Render):** [Link da API]([https://seu-link-do-render.com](https://todo-project-api-5ebh.onrender.com))
+* **Frontend (Vercel):** [**Aceda à aplicação aqui!**](https://todo-project-three-omega.vercel.app/)
+* **Backend (Render):** [Link da API](https://todo-project-api-5ebh.onrender.com)
 
 **Nota Importante:** O backend está hospedado no plano gratuito do Render e "adormece" após um período de inatividade. Ao aceder à aplicação pela primeira vez, a primeira tentativa de login ou registo pode falhar. **Para "acordar" o servidor, basta clicar no link da API acima.** Aguarde até ver uma mensagem como `{"detail":"Not Found"}` e, em seguida, a aplicação frontend funcionará perfeitamente.
 

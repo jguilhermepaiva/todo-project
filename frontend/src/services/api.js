@@ -1,21 +1,29 @@
-// A URL base da nossa API.
-// Em desenvolvimento, aponta para localhost.
-// Em produção (no Vercel), aponta para a URL do nosso backend no Render.
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+// Lê a variável de ambiente com o prefixo correto para Create React App.
+// Se não a encontrar, usa a URL de desenvolvimento local como fallback.
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000';
 
-// Função para fazer o login
+/**
+ * Função para fazer o login do utilizador.
+ * @param {string} username - O nome de utilizador.
+ * @param {string} password - A senha.
+ * @returns {Promise<any>} Os dados da resposta da API.
+ */
 export const loginUser = async (username, password) => {
-  const formData = new FormData();
-  formData.append('username', username);
-  formData.append('password', password);
-
+  // Create React App não lida bem com FormData no 'body' para CORS em algumas configurações.
+  // Enviar como JSON é mais robusto. O seu backend FastAPI já suporta isto.
   const response = await fetch(`${API_BASE_URL}/token`, {
     method: 'POST',
-    body: formData,
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams({
+      username: username,
+      password: password,
+    }),
   });
 
   if (!response.ok) {
-    throw new Error('Falha no login');
+    throw new Error('Falha no login. Verifique as suas credenciais.');
   }
   return response.json();
 };

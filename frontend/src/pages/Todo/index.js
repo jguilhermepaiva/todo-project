@@ -1,18 +1,23 @@
-import React, { useState, useEffect } from "react";
-import api from "../../services/api";
+import React, { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+// 1. Importa todas as funções necessárias do serviço centralizado
+import { getProfile, getTodos, createTodo, deleteTodo, verifyToken } from "../../services/api";
 import "./Todo.css";
+// ... (seus outros imports de assets como 'back', 'small_logo', etc. continuam aqui)
 import back from "../../assets/back.svg";
 import small_logo from "../../assets/small_logo.svg";
 import medium_logo from "../../assets/medium_logo.svg";
 import profile from "../../assets/profile.svg";
 import del from "../../assets/delete.png";
 import highest from "../../assets/highest.svg";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
+
 
 const Todo = () => {
+  // --- Estados do Componente ---
   const [todos, setTodos] = useState([]);
-  const [expandedTodo, setExpandedTodo] = useState(null); 
+  const [username, setUsername] = useState("");
+  const [expandedTodo, setExpandedTodo] = useState(null);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [formData, setFormData] = useState({
     titulo: "",
     category: "",
@@ -20,64 +25,60 @@ const Todo = () => {
     is_priority: false,
     date: "",
   });
-
-  const [username, setUsername] = useState("");
-  const [isPopupOpen, setIsPopupOpen] = useState(false); 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      const token = localStorage.getItem("token");
-      try {
-        const response = await fetch("http://localhost:8000/users/me", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (!response.ok) {
-          throw new Error("Failed to fetch user profile");
-        }
-        const user = await response.json();
-        setUsername(user.username);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchUserProfile();
-  }, []);
-
+  // --- Funções Auxiliares ---
   const capitalize = (str) => {
+    if (!str) return "";
     return str.charAt(0).toUpperCase() + str.slice(1);
   };
 
-  const fetchTodos = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      console.error("No token found");
-      return;
-    }
+  const toggleAccordion = (todoId) => {
+    setExpandedTodo(expandedTodo === todoId ? null : todoId);
+  };
 
+  // --- Lógica de Dados (API) ---
+
+  // Usamos useCallback para que esta função não seja recriada a cada renderização,
+  // otimizando o useEffect que depende dela.
+  const fetchTodos = useCallback(async () => {
     try {
-      const response = await axios.get("http://localhost:8000/todos/", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      setTodos(response.data);
+      const fetchedTodos = await getTodos();
+      setTodos(fetchedTodos);
     } catch (error) {
       console.error("Failed to fetch todos:", error);
     }
-  };
-
-  useEffect(() => {
-    fetchTodos();
   }, []);
+
+  // Efeito principal que roda quando a página carrega
+  useEffect(() => {
+    const initPage = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/"); // Se não há token, volta para o login
+        return;
+      }
+      try {
+        // Verifica se o token é válido, busca o perfil e as tarefas
+        await verifyToken(token);
+        const user = await getProfile();
+        setUsername(user.username);
+        await fetchTodos();
+      } catch (error) {
+        // Se qualquer uma das chamadas falhar (ex: token expirado), limpa e volta para o login
+        console.error("Token invalid, redirecting to login", error);
+        localStorage.removeItem("token");
+        navigate("/");
+      }
+    };
+    initPage();
+  }, [navigate, fetchTodos]); // Depende de navigate e fetchTodos
+
+  // --- Manipuladores de Eventos (Handlers) ---
 
   const handleInputChange = (event) => {
     const value =
-      event.target.value === "checkbox"
+      event.target.type === "checkbox"
         ? event.target.checked
         : event.target.value;
     setFormData({
@@ -88,83 +89,34 @@ const Todo = () => {
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
-
-    const token = localStorage.getItem("token");
-    if (!token) {
-      console.error("No authentication token found");
-      return;
-    }
-
     try {
-      await axios.post("http://localhost:8000/todos/", formData, {
-        headers: {
-          Authorization: `Bearer ${token}`, 
-          "Content-Type": "application/json",
-        },
-      });
-
-      fetchTodos(); 
-      setFormData({
-        titulo: "",
-        category: "",
-        description: "",
-        is_priority: false,
-        date: "",
-      });
-      setIsPopupOpen(false); 
+      await createTodo(formData);
+      await fetchTodos(); // Recarrega a lista para mostrar a nova tarefa
+      setIsPopupOpen(false); // Fecha o popup
+      // Limpa o formulário
+      setFormData({ titulo: "", category: "", description: "", is_priority: false, date: "" });
     } catch (error) {
       console.error("Erro ao criar a ToDo:", error);
     }
   };
 
   const handleDelete = async (todoId) => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      console.error("No token found");
-      return;
-    }
-
-    try {
-      const response = await fetch(`http://localhost:8000/todos/${todoId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`, 
-        },
-      });
-
-      if (response.ok) {
-        setTodos(todos.filter((todo) => todo.id !== todoId));
-      } else {
-        console.error("Failed to delete the todo. Status:", response.status);
-      }
-    } catch (error) {
-      console.error("Error deleting todo:", error);
-    }
-  };
-
-  const toggleAccordion = (todoId) => {
-    setExpandedTodo(expandedTodo === todoId ? null : todoId);
-  };
-
-  useEffect(() => {
-    const verifyToken = async () => {
-      const token = localStorage.getItem("token");
+    // Adicionamos uma confirmação para segurança
+    if (window.confirm("Tem a certeza de que deseja excluir esta tarefa?")) {
       try {
-        const response = await fetch(
-          `http://localhost:8000/verify-token/${token}`
-        );
-
-        if (!response.ok) {
-          throw new Error("Token verification failed");
-        }
+        await deleteTodo(todoId);
+        // Remove a tarefa da lista localmente para uma atualização instantânea da UI
+        setTodos(todos.filter((todo) => todo.id !== todoId));
       } catch (error) {
-        localStorage.removeItem("token");
-        navigate("/");
+        console.error("Error deleting todo:", error);
       }
-    };
+    }
+  };
 
-    verifyToken();
-  }, [navigate]);
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/");
+  };
 
   return (
     <div className="bg-[#1E1E26] max-md:bg-[#16161C] pb-10 h-[100vh] pt-[8%]">

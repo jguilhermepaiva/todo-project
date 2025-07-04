@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { loginUser, registerUser } from "../../services/api"; // 1. Importa as funções do serviço
 import desk_logo from "../../assets/desktop_logo.svg";
 import mobile_logo from "../../assets/mobile_logo.svg";
 
@@ -16,94 +17,54 @@ function Login() {
 
   const navigate = useNavigate();
 
-  const validateForm = (username, password) => {
-    if (!username || !password) {
-      setError("Login, email e senha são requeridos!");
-      return false;
-    }
-    setError("");
-    return true;
-  };
-
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!validateForm(loginUsername, loginPassword)) return;
     setLoading(true);
-
-    const formDetails = new URLSearchParams();
-    formDetails.append("username", loginUsername);
-    formDetails.append("password", loginPassword);
+    setError("");
 
     try {
-      const response = await fetch("http://localhost:8000/token", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: formDetails,
-      });
-
-      setLoading(false);
-
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem("token", data.access_token);
-        navigate("/todo");
-      } else {
-        const errorData = await response.json();
-        setError(errorData.detail || "Authentication failed!");
-      }
+      // 2. Usa a função do serviço em vez de 'fetch'
+      const data = await loginUser(loginUsername, loginPassword);
+      localStorage.setItem("token", data.access_token);
+      navigate("/todo");
     } catch (error) {
+      setError(error.message || "An error occurred. Please try again later.");
+    } finally {
       setLoading(false);
-      setError("An error occurred. Please try again later.");
     }
   };
 
   const handleRegister = async (event) => {
     event.preventDefault();
-
-    if (!validateForm(registerUsername, registerEmail ,registerPassword, registerConfirmPassword)) return;
-
     setLoading(true);
+    setError("");
 
-    const formDetails = {
-      username: registerUsername,
-      email: registerEmail,
-      password: registerPassword,
-      confirm_password: registerConfirmPassword,
-    };
+    if (registerPassword !== registerConfirmPassword) {
+      setError("As senhas não coincidem!");
+      setLoading(false);
+      return;
+    }
 
     try {
-      const response = await fetch("http://localhost:8000/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formDetails),
+      // 3. Usa a função do serviço em vez de 'fetch'
+      await registerUser({
+        username: registerUsername,
+        email: registerEmail,
+        password: registerPassword,
+        confirm_password: registerConfirmPassword,
       });
-
-      setLoading(false);
-
-      if (response.ok) {
-        setError("Registro concluído com sucesso! Faça login para continuar.");
-        setIsLogin(true);
-      } else {
-        const errorData = await response.json();
-        if (Array.isArray(errorData.detail)) {
-          const errorMessages = errorData.detail.map((err) => err.msg).join(", ");
-          setError(errorMessages || "Registro falhou!");
-        } else {
-          setError(errorData.detail || "Registro falhou!");
-        }
-      }
+      setError("Registro concluído com sucesso! Faça login para continuar.");
+      setIsLogin(true); // Muda para a tela de login após o sucesso
     } catch (error) {
+      setError(error.message || "Registro falhou!");
+    } finally {
       setLoading(false);
-      setError("Um erro ocorreu. Por favor tente novamente mais tarde.");
     }
   };
 
   const toggleForm = () => {
-    setIsLogin(!isLogin); // Alterna entre true e false
+    setIsLogin(!isLogin);
+    setError(""); // Limpa os erros ao trocar de formulário
   };
 
   return (

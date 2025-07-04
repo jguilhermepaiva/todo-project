@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import api from "../../api";
+import api from "../../services/api";
 import "./Todo.css";
 import back from "../../assets/back.svg";
 import small_logo from "../../assets/small_logo.svg";
